@@ -208,6 +208,114 @@ public :
 
     }
 
+    void inst_RET_J() {
+
+        SP-- ;
+        PC = stack[SP] ;
+
+
+    }
+
+
+
+    void inst_JUMP_J(){
+
+        PC = opcode & 0x0FFF ;
+
+    }
+
+
+    void inst_CALL_J() {
+
+        stack[SP] = PC ;
+        SP++ ;
+        PC = opcode & 0x0FFF ;
+
+    }
+
+
+    void inst_SE_J(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+        uint8_t immediate = (opcode & 0x00FF) ;
+
+        if ( reg[Vx] == immediate) {
+
+            PC += 2 ;
+        }
+
+    }
+
+
+    void inst_SNE_J(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+        uint8_t immediate = (opcode & 0x00FF) ;
+
+        if ( reg[Vx] != immediate) {
+
+            PC += 2 ;
+        }
+
+    }
+
+
+    void inst_SE2_J(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+        uint8_t Vy = (opcode & 0x00F0) >> 4;
+
+        if ( reg[Vx] == reg[Vy]) {
+
+            PC += 2 ;
+        }
+
+    }
+
+    void inst_SNE2_J(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+        uint8_t Vy = (opcode & 0x00F0) >> 4;
+
+        if ( reg[Vx] != reg[Vy]) {
+
+            PC += 2 ;
+        }
+
+    }
+
+    void inst_JPV0_J(){
+
+        PC = reg[0] + ( opcode & 0x0FFF ) ;
+
+
+    }
+
+
+    void inst_SKP_J(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8 ;
+
+        if (keys[reg[Vx]]) {
+            PC += 2 ;
+
+        }
+
+    }
+
+
+    void inst_SKPN_J(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8 ;
+
+        if ( !keys[reg[Vx]]) {
+            PC += 2 ;
+
+        }
+
+    }    
+
+
 
 
 
