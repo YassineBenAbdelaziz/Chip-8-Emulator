@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdio>
 #include <fstream>
+#include <stdlib.h>
 #define INITIAL_ADDRESS 0x200 
 #define FONTSET_SIZE  80
 #define FONTSET_ADDRESS 0X50
@@ -318,6 +319,242 @@ public :
 
 
 
+    void inst_ADD_I (){
+
+    uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
+    uint16_t immediate = opcode & 0x00FF ;
+    reg[Vx] += immediate ;
+
+}
+
+    void inst_LD_I(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8 ;
+        uint8_t immediate = (opcode & 0x00FF) ;
+
+        reg[Vx] = immediate ;
+
+    }
+
+
+
+    void inst_LDI_I(){
+
+        uint16_t immediate = (opcode & 0x0FFF) ;
+
+        indexReg = immediate ;
+    
+    }
+
+
+    void inst_LDD_R(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+
+        reg[Vx] = delayTimer ;
+
+    }
+
+    void inst_LDVx_R(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+
+        delayTimer = reg[Vx] ;
+
+    }
+
+    void inst_LDVxS_R(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+
+        soundTimer = reg[Vx] ;
+
+    }
+
+
+    void inst_LDK_R(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+
+        if (keys[0])
+        {
+            reg[Vx] = 0;
+        }
+        else if (keys[1])
+        {
+            reg[Vx] = 1;
+        }
+        else if (keys[2])
+        {
+            reg[Vx] = 2;
+        }
+        else if (keys[3])
+        {
+            reg[Vx] = 3;
+        }
+        else if (keys[4])
+        {
+            reg[Vx] = 4;
+        }
+        else if (keys[5])
+        {
+            reg[Vx] = 5;
+        }
+        else if (keys[6])
+        {
+            reg[Vx] = 6;
+        }
+        else if (keys[7])
+        {
+            reg[Vx] = 7;
+        }
+        else if (keys[8])
+        {
+            reg[Vx] = 8;
+        }
+        else if (keys[9])
+        {
+            reg[Vx] = 9;
+        }
+        else if (keys[10])
+        {
+            reg[Vx] = 10;
+        }
+        else if (keys[11])
+        {
+            reg[Vx] = 11;
+        }
+        else if (keys[12])
+        {
+            reg[Vx] = 12;
+        }
+        else if (keys[13])
+        {
+            reg[Vx] = 13;
+        }
+        else if (keys[14])
+        {
+            reg[Vx] = 14;
+        }
+        else if (keys[15])
+        {
+            reg[Vx] = 15;
+        }
+        else
+        {
+            PC -= 2;
+        }
+
+
+    }
+
+
+    void inst_ADDI_R(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+
+        indexReg += reg[Vx] ;
+
+    }
+
+    void inst_LDSprite_R(){
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+
+        indexReg = FONTSET_ADDRESS + (5 * reg[Vx]) ;
+
+    }
+
+
+    void inst_LD_B_Vx(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+        uint8_t value = reg[Vx] ;
+
+        memory[indexReg + 2] = value % 10;
+        value /= 10 ;
+        memory[indexReg + 1] = value % 10;
+        value /= 10 ;
+        memory[indexReg ] = value % 10;
+    }
+
+
+
+    void inst_ST(){
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+
+        for (uint8_t i = 0; i <= Vx; i++)
+        {
+            memory[indexReg + i] = reg[i];
+        }
+
+    }
+
+
+    void inst_LDV_R(){
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+
+        for (uint8_t i = 0; i <= Vx; i++)
+        {
+            
+            reg[i] = memory[indexReg + i ] ;
+        }
+    }
+
+
+    void inst_CLR(){
+
+        memset(video, 0, sizeof(video));
+
+    }
+    
+    uint8_t randGen(){
+
+        return (uint8_t)(rand() % 100);
+
+
+    }
+
+
+    void inst_RNG_R(){
+
+        uint8_t Vx = (opcode & 0x0F00) >> 8;
+
+        reg[Vx] = randGen() & ( opcode & 0x00FF);
+
+
+    }
+
+
+
+    void inst_DRAW(){
+
+        uint8_t Vx = (opcode & 0x0F00 ) >> 8 ;
+        uint8_t Vy = (opcode & 0x00F0 ) >> 4 ;
+        uint8_t Height = opcode & 0x000F ;
+        uint8_t x = reg[Vx] % 64 ;
+        uint8_t y = reg[Vy] % 32 ;
+        reg[15] = 0;
+
+        for(uint8_t row = 0 ; row < Height ; row++){
+
+            uint8_t rowbyte = memory[indexReg + row ] ;
+            for( uint8_t col = 0 ; col < 8 ; col ++ ){
+                uint8_t pixel = rowbyte & (0x80 >> col ) ;
+                uint32_t* screenPixel = &video[(y + row) * 64 + x + col] ;
+
+                if (pixel){
+                    if (*screenPixel == 0xFFFFFFFF)
+                        reg[15] = 1 ;
+                }
+
+                *screenPixel = *screenPixel ^ 0xFFFFFFFF ;
+            }
+        }
+    }
+
+
+
+    
 
 
 
