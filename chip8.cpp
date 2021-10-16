@@ -87,7 +87,7 @@ public :
 
 
 
-    void inst_ADD_R (){
+    void inst_ADD(){
 
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -109,7 +109,7 @@ public :
     }
 
 
-    void inst_SUB_R() {
+    void inst_SUBR() {
         // Vx - Vy
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -130,7 +130,7 @@ public :
 
     }
 
-    void inst_LD_R() {
+    void inst_COPY() {
 
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -139,7 +139,7 @@ public :
 
     }
 
-    void inst_OR_R() {
+    void inst_OR() {
 
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -151,7 +151,7 @@ public :
     }
 
 
-    void inst_AND_R(){
+    void inst_AND(){
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
 
@@ -160,7 +160,7 @@ public :
 
     }
 
-    void inst_XOR_R(){
+    void inst_XOR(){
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
 
@@ -169,7 +169,7 @@ public :
 
     }
 
-    void inst_SHR_R(){
+    void inst_SHR(){
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         
 
@@ -177,7 +177,7 @@ public :
         reg[15] = reg[Vx] & 0x1;
     }
 
-    void inst_SHL_R(){
+    void inst_SHL(){
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         
 
@@ -188,7 +188,7 @@ public :
 
 
     
-    void inst_SUBN_R() {
+    void inst_SUB() {
         // Vy - Vx
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -209,7 +209,7 @@ public :
 
     }
 
-    void inst_RET_J() {
+    void inst_RET() {
 
         SP-- ;
         PC = stack[SP] ;
@@ -219,14 +219,14 @@ public :
 
 
 
-    void inst_JUMP_J(){
+    void inst_JUMP(){
 
         PC = opcode & 0x0FFF ;
 
     }
 
 
-    void inst_CALL_J() {
+    void inst_CALL() {
 
         stack[SP] = PC ;
         SP++ ;
@@ -235,7 +235,7 @@ public :
     }
 
 
-    void inst_SE_J(){
+    void inst_SEI(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
         uint8_t immediate = (opcode & 0x00FF) ;
@@ -248,7 +248,7 @@ public :
     }
 
 
-    void inst_SNE_J(){
+    void inst_SNEI(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
         uint8_t immediate = (opcode & 0x00FF) ;
@@ -261,7 +261,7 @@ public :
     }
 
 
-    void inst_SE2_J(){
+    void inst_SE(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
         uint8_t Vy = (opcode & 0x00F0) >> 4;
@@ -273,7 +273,7 @@ public :
 
     }
 
-    void inst_SNE2_J(){
+    void inst_SNE(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
         uint8_t Vy = (opcode & 0x00F0) >> 4;
@@ -285,7 +285,7 @@ public :
 
     }
 
-    void inst_JPV0_J(){
+    void inst_BR(){
 
         PC = reg[0] + ( opcode & 0x0FFF ) ;
 
@@ -293,7 +293,7 @@ public :
     }
 
 
-    void inst_SKP_J(){
+    void inst_SKP(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8 ;
 
@@ -305,7 +305,7 @@ public :
     }
 
 
-    void inst_SKPN_J(){
+    void inst_SKPN(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8 ;
 
@@ -319,7 +319,7 @@ public :
 
 
 
-    void inst_ADD_I (){
+    void inst_ADDI(){
 
     uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
     uint16_t immediate = opcode & 0x00FF ;
@@ -327,7 +327,7 @@ public :
 
 }
 
-    void inst_LD_I(){
+    void inst_STRI(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8 ;
         uint8_t immediate = (opcode & 0x00FF) ;
@@ -338,7 +338,7 @@ public :
 
 
 
-    void inst_LDI_I(){
+    void inst_STR(){
 
         uint16_t immediate = (opcode & 0x0FFF) ;
 
@@ -347,7 +347,7 @@ public :
     }
 
 
-    void inst_LDD_R(){
+    void inst_STRD(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -355,7 +355,7 @@ public :
 
     }
 
-    void inst_LDVx_R(){
+    void inst_SETD(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -363,7 +363,7 @@ public :
 
     }
 
-    void inst_LDVxS_R(){
+    void inst_STRS(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -372,7 +372,7 @@ public :
     }
 
 
-    void inst_LDK_R(){
+    void inst_WAIT(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -449,7 +449,7 @@ public :
     }
 
 
-    void inst_ADDI_R(){
+    void inst_OFFS(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -457,7 +457,7 @@ public :
 
     }
 
-    void inst_LDSprite_R(){
+    void inst_LDSprite(){
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
         indexReg = FONTSET_ADDRESS + (5 * reg[Vx]) ;
@@ -465,7 +465,7 @@ public :
     }
 
 
-    void inst_LD_B_Vx(){
+    void inst_BCD(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
         uint8_t value = reg[Vx] ;
@@ -479,7 +479,7 @@ public :
 
 
 
-    void inst_ST(){
+    void inst_STRM(){
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
         for (uint8_t i = 0; i <= Vx; i++)
@@ -490,7 +490,7 @@ public :
     }
 
 
-    void inst_LDV_R(){
+    void inst_LDM(){
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
         for (uint8_t i = 0; i <= Vx; i++)
@@ -515,7 +515,7 @@ public :
     }
 
 
-    void inst_RNG_R(){
+    void inst_RND(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -554,7 +554,7 @@ public :
 
 
 
-    
+
 
 
 
