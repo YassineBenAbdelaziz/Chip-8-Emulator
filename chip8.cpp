@@ -363,7 +363,7 @@ public :
 
     }
 
-    void inst_STRS(){
+    void inst_SETS(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -552,10 +552,167 @@ public :
         }
     }
 
+    void inst_null(){
+
+    }
+
+
+    void decode(){
+        switch (opcode & 0xF000 )
+        {
+        case 0x0000:
+            switch (opcode & 0x000F)
+            {
+            case 0x0000:
+                inst_CLR();
+                break;
+            case 0x000E:
+                inst_RET;
+                break;           
+            default:
+            inst_null();
+                break;
+            }
+            break;
+        case 0x8000 : 
+            switch (opcode & 0x000F)
+            {
+            case 0x0000:
+                inst_COPY();
+                break;
+            case 0x0001:
+                inst_OR();
+                break;
+            case 0x0002:
+                inst_AND();
+                break;
+            case 0x0003:
+                inst_XOR();
+                break;
+            case 0x0004:
+                inst_ADD();
+                break;
+            case 0x0005:
+                inst_SUB();
+                break;
+            case 0x0006:
+                inst_SHR();
+                break;
+            case 0x0007:
+                inst_SUBR();
+                break;
+            case 0x000E:
+                inst_SHL();
+                break;
+            default:
+                inst_null();
+                break;
+            }
+        case  0xE000 : case  0xF000:
+            switch (opcode & 0x00FF)
+            {
+            case 0x00A1:
+                inst_SKPN();
+                break;
+            case 0x009E:
+                inst_SKP();
+                break;   
+            case 0x0007:
+                inst_STRD();
+                break;
+            case 0x000A:
+                inst_WAIT();
+                break;
+            case 0x0015:
+                inst_SETD();
+                break;
+            case 0x0018:
+                inst_SETS();
+                break;
+            case 0x001E:
+                inst_OFFS();
+                break;
+            case 0x0029:
+                inst_LDSprite();
+                break;
+            case 0x0033:
+                inst_BCD();
+                break;
+            case 0x0055:
+                inst_STRM();
+                break;
+            case 0x0065:
+                inst_LDM();
+                break;
+            default:
+                inst_null();
+                break;
+            }
+        case 0x1000:
+            inst_JUMP();
+            break;
+        case 0x2000:
+            inst_CALL();
+            break;
+        case 0x3000:
+            inst_SEI();
+            break;
+        case 0x4000:
+            inst_SNEI();
+            break;
+        case 0x5000:
+            inst_SE();
+            break;
+        case 0x6000:
+            inst_STRI();
+            break;
+        case 0x7000:
+            inst_ADDI();
+            break;
+        case 0x9000:
+            inst_SNE();
+            break;
+        case 0xA000:
+            inst_STR();
+            break;
+        case 0xB000:
+            inst_BR();
+            break;
+        case 0xC000:
+            inst_RND();
+            break;
+        case 0xD000:
+            inst_DRAW();
+            break;
+        default:
+            inst_null();
+            break;
+        }
 
 
 
+    }
 
+
+
+    void cycle(){
+        
+        opcode = (memory[PC] << 8) | memory[PC + 1];
+
+        PC += 2;
+
+        decode();
+
+        if (delayTimer > 0)
+        {
+            --delayTimer;
+        }
+
+        if (soundTimer > 0)
+        {
+            --soundTimer;
+        }
+    }
 
 
 
