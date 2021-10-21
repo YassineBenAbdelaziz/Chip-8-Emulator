@@ -1,21 +1,11 @@
+#include "graphics.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>
 
 using namespace std;
 
 
-class graphics {
-
-    private :
-
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-	SDL_Texture* texture;
-
-    public :
-
-
-    graphics(char const* title, int windowWidth, int windowHeight, int textureWidth, int textureHeight){
+    graphics::graphics(char const* title, int windowWidth, int windowHeight, int textureWidth, int textureHeight){
 
         SDL_Init(SDL_INIT_VIDEO);
         window = SDL_CreateWindow(title,
@@ -43,7 +33,7 @@ class graphics {
 
 
 
-    ~graphics(){
+    graphics::~graphics(){
         SDL_DestroyTexture(texture);
 		SDL_DestroyRenderer(renderer);
 		SDL_DestroyWindow(window);
@@ -52,7 +42,7 @@ class graphics {
 
 
 
-	void Update(void const* buffer, int pitch)
+	void graphics::Update(void const* buffer, int pitch)
 	{
 		SDL_UpdateTexture(texture, NULL, buffer, pitch);
 		SDL_RenderClear(renderer);
@@ -61,7 +51,7 @@ class graphics {
 	}
 
 
-    bool ProcessInput(uint8_t* keys)
+    bool graphics::ProcessInput(uint8_t* keys)
 	{
 		bool quit = false;
 		SDL_Event event ;
@@ -186,14 +176,3 @@ class graphics {
 
 		return quit;
 	}
-
-
-
-
-
-
-
-
-
-
-};

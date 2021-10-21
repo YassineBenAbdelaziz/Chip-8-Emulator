@@ -1,67 +1,32 @@
+#include "chip8.hpp"
 #include <iostream>
 #include <cstdio>
 #include <fstream>
+#include <cstring>
 #include <stdlib.h>
-#define INITIAL_ADDRESS 0x200 
-#define FONTSET_SIZE  80
-#define FONTSET_ADDRESS 0X50
+
 
 
 
 using namespace std;
 
 
-class Chip8 {
-
-public :
 
 
-    uint16_t opcode;
-    uint8_t reg[16] ;
-    uint8_t memory[4096] ;
-    uint16_t indexReg ;
-    uint16_t PC ;
-    uint8_t SP ;
-    uint8_t stack[16] ;
-    uint8_t delayTimer ;
-	uint8_t soundTimer ;
-    uint8_t keys[16] ;
-	uint32_t video[2048] ;
-    
-    uint8_t fontset[FONTSET_SIZE] =
-{
-	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
-	0x20, 0x60, 0x20, 0x20, 0x70, // 1
-	0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
-	0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
-	0x90, 0x90, 0xF0, 0x10, 0x10, // 4
-	0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
-	0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
-	0xF0, 0x10, 0x20, 0x40, 0x40, // 7
-	0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
-	0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
-	0xF0, 0x90, 0xF0, 0x90, 0x90, // A
-	0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
-	0xF0, 0x80, 0x80, 0x80, 0xF0, // C
-	0xE0, 0x90, 0x90, 0x90, 0xE0, // D
-	0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
-};
 
-
-    Chip8(){
+    Chip8::Chip8(){
         
         PC = INITIAL_ADDRESS ;
 
-	for ( int i = 0; i < FONTSET_SIZE; i++)
-	{
-		memory[FONTSET_ADDRESS + i] = fontset[i];
-	}
+        for ( int i = 0; i < FONTSET_SIZE; i++)
+        {
+            memory[FONTSET_ADDRESS + i] = fontset[i];
+        }
 
     }
 
 
-    void load_ROM(char* filename){
+    void Chip8::load_ROM(char* filename){
         streampos size;
         char * buffer;
         ifstream myfile ("example.txt", ios::binary | ios::ate);
@@ -87,7 +52,7 @@ public :
 
 
 
-    void inst_ADD(){
+    void Chip8::inst_ADD(){
 
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -109,7 +74,7 @@ public :
     }
 
 
-    void inst_SUBR() {
+    void Chip8::inst_SUBR() {
         // Vx - Vy
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -130,7 +95,7 @@ public :
 
     }
 
-    void inst_COPY() {
+    void Chip8::inst_COPY() {
 
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -139,7 +104,7 @@ public :
 
     }
 
-    void inst_OR() {
+    void Chip8::inst_OR() {
 
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -151,7 +116,7 @@ public :
     }
 
 
-    void inst_AND(){
+    void Chip8::inst_AND(){
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
 
@@ -160,7 +125,7 @@ public :
 
     }
 
-    void inst_XOR(){
+    void Chip8::inst_XOR(){
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
 
@@ -169,7 +134,7 @@ public :
 
     }
 
-    void inst_SHR(){
+    void Chip8::inst_SHR(){
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         
 
@@ -177,7 +142,7 @@ public :
         reg[15] = reg[Vx] & 0x1;
     }
 
-    void inst_SHL(){
+    void Chip8::inst_SHL(){
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         
 
@@ -188,7 +153,7 @@ public :
 
 
     
-    void inst_SUB() {
+    void Chip8::inst_SUB() {
         // Vy - Vx
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -209,7 +174,7 @@ public :
 
     }
 
-    void inst_RET() {
+    void Chip8::inst_RET() {
 
         SP-- ;
         PC = stack[SP] ;
@@ -219,14 +184,14 @@ public :
 
 
 
-    void inst_JUMP(){
+    void Chip8::inst_JUMP(){
 
         PC = opcode & 0x0FFF ;
 
     }
 
 
-    void inst_CALL() {
+    void Chip8::inst_CALL() {
 
         stack[SP] = PC ;
         SP++ ;
@@ -235,7 +200,7 @@ public :
     }
 
 
-    void inst_SEI(){
+    void Chip8::inst_SEI(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
         uint8_t immediate = (opcode & 0x00FF) ;
@@ -248,7 +213,7 @@ public :
     }
 
 
-    void inst_SNEI(){
+    void Chip8::inst_SNEI(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
         uint8_t immediate = (opcode & 0x00FF) ;
@@ -261,7 +226,7 @@ public :
     }
 
 
-    void inst_SE(){
+    void Chip8::inst_SE(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
         uint8_t Vy = (opcode & 0x00F0) >> 4;
@@ -273,7 +238,7 @@ public :
 
     }
 
-    void inst_SNE(){
+    void Chip8::inst_SNE(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
         uint8_t Vy = (opcode & 0x00F0) >> 4;
@@ -285,7 +250,7 @@ public :
 
     }
 
-    void inst_BR(){
+    void Chip8::inst_BR(){
 
         PC = reg[0] + ( opcode & 0x0FFF ) ;
 
@@ -293,7 +258,7 @@ public :
     }
 
 
-    void inst_SKP(){
+    void Chip8::inst_SKP(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8 ;
 
@@ -305,7 +270,7 @@ public :
     }
 
 
-    void inst_SKPN(){
+    void Chip8::inst_SKPN(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8 ;
 
@@ -319,7 +284,7 @@ public :
 
 
 
-    void inst_ADDI(){
+    void Chip8::inst_ADDI(){
 
     uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
     uint16_t immediate = opcode & 0x00FF ;
@@ -327,7 +292,7 @@ public :
 
 }
 
-    void inst_STRI(){
+    void Chip8::inst_STRI(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8 ;
         uint8_t immediate = (opcode & 0x00FF) ;
@@ -338,7 +303,7 @@ public :
 
 
 
-    void inst_STR(){
+    void Chip8::inst_STR(){
 
         uint16_t immediate = (opcode & 0x0FFF) ;
 
@@ -347,7 +312,7 @@ public :
     }
 
 
-    void inst_STRD(){
+    void Chip8::inst_STRD(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -355,7 +320,7 @@ public :
 
     }
 
-    void inst_SETD(){
+    void Chip8::inst_SETD(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -363,7 +328,7 @@ public :
 
     }
 
-    void inst_SETS(){
+    void Chip8::inst_SETS(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -372,7 +337,7 @@ public :
     }
 
 
-    void inst_WAIT(){
+    void Chip8::inst_WAIT(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -449,7 +414,7 @@ public :
     }
 
 
-    void inst_OFFS(){
+    void Chip8::inst_OFFS(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -457,7 +422,7 @@ public :
 
     }
 
-    void inst_LDSprite(){
+    void Chip8::inst_LDSprite(){
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
         indexReg = FONTSET_ADDRESS + (5 * reg[Vx]) ;
@@ -465,7 +430,7 @@ public :
     }
 
 
-    void inst_BCD(){
+    void Chip8::inst_BCD(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
         uint8_t value = reg[Vx] ;
@@ -479,7 +444,7 @@ public :
 
 
 
-    void inst_STRM(){
+    void Chip8::inst_STRM(){
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
         for (uint8_t i = 0; i <= Vx; i++)
@@ -490,7 +455,7 @@ public :
     }
 
 
-    void inst_LDM(){
+    void Chip8::inst_LDM(){
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
         for (uint8_t i = 0; i <= Vx; i++)
@@ -501,13 +466,13 @@ public :
     }
 
 
-    void inst_CLR(){
+    void Chip8::inst_CLR(){
 
         memset(video, 0, sizeof(video));
 
     }
     
-    uint8_t randGen(){
+    uint8_t Chip8::randGen(){
 
         return (uint8_t)(rand() % 100);
 
@@ -515,7 +480,7 @@ public :
     }
 
 
-    void inst_RND(){
+    void Chip8::inst_RND(){
 
         uint8_t Vx = (opcode & 0x0F00) >> 8;
 
@@ -526,7 +491,7 @@ public :
 
 
 
-    void inst_DRAW(){
+    void Chip8::inst_DRAW(){
 
         uint8_t Vx = (opcode & 0x0F00 ) >> 8 ;
         uint8_t Vy = (opcode & 0x00F0 ) >> 4 ;
@@ -552,12 +517,12 @@ public :
         }
     }
 
-    void inst_null(){
+    void Chip8::inst_null(){
 
     }
 
 
-    void decode(){
+    void Chip8::decode(){
         switch (opcode & 0xF000 )
         {
         case 0x0000:
@@ -695,7 +660,7 @@ public :
 
 
 
-    void cycle(){
+    void Chip8::cycle(){
         
         opcode = (memory[PC] << 8) | memory[PC + 1];
 
@@ -716,14 +681,6 @@ public :
 
 
 
-
-
-
-
-
-
-
-};
 
 
 
