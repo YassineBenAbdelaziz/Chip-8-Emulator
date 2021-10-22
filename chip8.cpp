@@ -496,8 +496,8 @@ using namespace std;
         uint8_t Vx = (opcode & 0x0F00 ) >> 8 ;
         uint8_t Vy = (opcode & 0x00F0 ) >> 4 ;
         uint8_t Height = opcode & 0x000F ;
-        uint8_t x = reg[Vx] % 64 ;
-        uint8_t y = reg[Vy] % 32 ;
+        uint8_t x = reg[Vx] % VIDEO_WIDTH ;
+        uint8_t y = reg[Vy] % VIDEO_HEIGHT ;
         reg[15] = 0;
 
         for(uint8_t row = 0 ; row < Height ; row++){
@@ -505,7 +505,7 @@ using namespace std;
             uint8_t rowbyte = memory[indexReg + row ] ;
             for( uint8_t col = 0 ; col < 8 ; col ++ ){
                 uint8_t pixel = rowbyte & (0x80 >> col ) ;
-                uint32_t* screenPixel = &video[(y + row) * 64 + x + col] ;
+                uint32_t* screenPixel = &video[(y + row) * VIDEO_WIDTH + x + col] ;
 
                 if (pixel){
                     if (*screenPixel == 0xFFFFFFFF)

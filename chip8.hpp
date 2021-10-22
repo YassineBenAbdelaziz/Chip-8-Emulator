@@ -5,6 +5,8 @@
 #include <fstream>
 #include <cstring>
 #include <stdlib.h>
+#define VIDEO_HEIGHT 32
+#define VIDEO_WIDTH 64
 #define INITIAL_ADDRESS 0x200 
 #define FONTSET_SIZE  80
 #define FONTSET_ADDRESS 0X50
