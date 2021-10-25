@@ -17,16 +17,16 @@ public :
 
 
     uint16_t opcode;
-    uint8_t reg[16] ;
-    uint8_t memory[4096] ;
-    uint16_t indexReg ;
-    uint16_t PC ;
-    uint8_t SP ;
-    uint8_t stack[16] ;
-    uint8_t delayTimer ;
-	uint8_t soundTimer ;
-    uint8_t keys[16] ;
-	uint32_t video[2048] ;
+    uint8_t reg[16]{} ;
+    uint8_t memory[4096]{} ;
+    uint16_t indexReg{} ;
+    uint16_t PC{} ;
+    uint8_t SP{} ;
+    uint16_t stack[16]{} ;
+    uint8_t delayTimer{} ;
+	uint8_t soundTimer{} ;
+    uint8_t keys[16]{} ;
+	uint32_t video[VIDEO_HEIGHT * VIDEO_WIDTH]{} ;
 
     uint8_t fontset[FONTSET_SIZE] =
 {
@@ -119,6 +119,7 @@ public :
 
     void decode();
     void cycle();
+
 };
 
 
