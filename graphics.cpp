@@ -1,6 +1,5 @@
 #include "graphics.hpp"
-#include <SDL2/SDL.h>
-#include <iostream>
+
 
 using namespace std;
 
@@ -39,6 +38,11 @@ using namespace std;
 		SDL_DestroyWindow(window);
 		SDL_Quit();
     }
+
+	void graphics::delay(uint32_t time){
+
+		SDL_Delay(time);
+	}
 
 
 
@@ -123,7 +127,7 @@ using namespace std;
 					{
 						case SDLK_x:
 							keys[0] = 0;
-						break;
+							break;
 						case SDLK_1:
 							keys[1] = 0;
 						    break;
@@ -133,16 +137,16 @@ using namespace std;
 						case SDLK_3:
 							keys[3] = 0;
 						    break;
-						case SDLK_q:
+						case SDLK_a:
 							keys[4] = 0;
 						    break;
-						case SDLK_w:
+						case SDLK_z:
 							keys[5] = 0;
 						    break;
 						case SDLK_e:
 							keys[6] = 0;
 						    break;
-						case SDLK_a:
+						case SDLK_q:
 							keys[7] = 0;
 						    break;
 						case SDLK_s:
@@ -151,7 +155,7 @@ using namespace std;
 						case SDLK_d:
 							keys[9] = 0;
 						    break;
-						case SDLK_z:
+						case SDLK_w:
 							keys[0xA] = 0;
 						    break;
 						case SDLK_c:
