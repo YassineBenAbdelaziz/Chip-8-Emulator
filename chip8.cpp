@@ -28,18 +28,19 @@ using namespace std;
 
     void Chip8::load_ROM(char* filename){
         streampos size;
-        char * buffer;
-        ifstream myfile ("example.txt", ios::binary | ios::ate);
+        char* buffer;
+        ifstream myfile (filename, ios::binary | ios::ate);
         if (myfile.is_open())
         {
             size = myfile.tellg();
-            buffer = new char [size];
+            buffer = new char[size];
             myfile.seekg (0, ios::beg);
             myfile.read (buffer, size);
             myfile.close();
 
-        for (int i = 0; i < size; ++i)
+        for (long i = 0; i < size; ++i)
 		{
+            
 			memory[INITIAL_ADDRESS + i] = buffer[i];
 		}
             delete[] buffer ;
@@ -70,11 +71,11 @@ using namespace std;
         }
 
         reg[Vx] = (reg[Vx] + reg[Vy]) & 0xFFu;
-
+        
     }
 
 
-    void Chip8::inst_SUBR() {
+    void Chip8::inst_SUB() {
         // Vx - Vy
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -88,9 +89,9 @@ using namespace std;
 
             reg[15] = 0 ;
         }
-
-        reg[Vx] -= reg[Vy] ;
-
+        
+        reg[Vx] = reg[Vx] - reg[Vy] ;
+        
 
 
     }
@@ -101,7 +102,7 @@ using namespace std;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
 
         reg[Vx] = reg[Vy];
-
+        
     }
 
     void Chip8::inst_OR() {
@@ -110,7 +111,7 @@ using namespace std;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
 
         reg[Vx] |= reg[Vy];        
-
+        
 
 
     }
@@ -121,7 +122,7 @@ using namespace std;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
 
         reg[Vx] &= reg[Vy];  
-
+        
 
     }
 
@@ -129,31 +130,31 @@ using namespace std;
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
 
-        reg[Vx] ^= reg[Vy];  
+        reg[Vx] ^= reg[Vy]; 
+        
 
 
     }
 
     void Chip8::inst_SHR(){
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
-        
-
-        reg[Vx] >>= 1 ;  
+         
         reg[15] = reg[Vx] & 0x1;
+        reg[Vx] >>= 1 ; 
+        
     }
 
     void Chip8::inst_SHL(){
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
-        
-
-        reg[Vx] <<= 1 ;  
+            
         reg[15] = ( reg[Vx] & 0x80 ) >> 7 ;
+        reg[Vx] <<= 1 ;
     }
 
 
 
     
-    void Chip8::inst_SUB() {
+    void Chip8::inst_SUBR() {
         // Vy - Vx
         uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
         uint8_t Vy = ( opcode & 0x00F0 ) >> 4;
@@ -168,8 +169,8 @@ using namespace std;
             reg[15] = 0 ;
         }
 
-        reg[Vx] += - reg[Vy] ;
-
+        reg[Vx] =  reg[Vy] - reg[Vx];
+        
 
 
     }
@@ -178,6 +179,7 @@ using namespace std;
 
         SP-- ;
         PC = stack[SP] ;
+        
 
 
     }
@@ -185,8 +187,8 @@ using namespace std;
 
 
     void Chip8::inst_JUMP(){
-
-        PC = opcode & 0x0FFF ;
+        uint16_t address = opcode & 0x0FFFu;
+        PC = address ;
 
     }
 
@@ -196,7 +198,7 @@ using namespace std;
         stack[SP] = PC ;
         SP++ ;
         PC = opcode & 0x0FFF ;
-
+        
     }
 
 
@@ -209,7 +211,7 @@ using namespace std;
 
             PC += 2 ;
         }
-
+        
     }
 
 
@@ -253,7 +255,7 @@ using namespace std;
     void Chip8::inst_BR(){
 
         PC = reg[0] + ( opcode & 0x0FFF ) ;
-
+        
 
     }
 
@@ -287,8 +289,9 @@ using namespace std;
     void Chip8::inst_ADDI(){
 
     uint8_t Vx = ( opcode & 0x0F00 ) >> 8;
-    uint16_t immediate = opcode & 0x00FF ;
+    uint16_t immediate = opcode & 0x00FF ;  
     reg[Vx] += immediate ;
+    
 
 }
 
@@ -308,6 +311,7 @@ using namespace std;
         uint16_t immediate = (opcode & 0x0FFF) ;
 
         indexReg = immediate ;
+
     
     }
 
@@ -469,6 +473,7 @@ using namespace std;
     void Chip8::inst_CLR(){
 
         memset(video, 0, sizeof(video));
+    
 
     }
     
@@ -498,24 +503,28 @@ using namespace std;
         uint8_t Height = opcode & 0x000F ;
         uint8_t x = reg[Vx] % VIDEO_WIDTH ;
         uint8_t y = reg[Vy] % VIDEO_HEIGHT ;
+        
         reg[15] = 0;
-
         for(uint8_t row = 0 ; row < Height ; row++){
 
             uint8_t rowbyte = memory[indexReg + row ] ;
+
             for( uint8_t col = 0 ; col < 8 ; col ++ ){
+
                 uint8_t pixel = rowbyte & (0x80 >> col ) ;
-                uint32_t* screenPixel = &video[(y + row) * VIDEO_WIDTH + x + col] ;
+                uint32_t* screenPixel = &video[(y + row) * VIDEO_WIDTH + (x + col)];
 
                 if (pixel){
-                    if (*screenPixel == 0xFFFFFFFF)
-                        reg[15] = 1 ;
-                }
 
-                *screenPixel = *screenPixel ^ 0xFFFFFFFF ;
+                    if (*screenPixel == 0xFFFFFFFF){
+                        reg[15] = 1 ;
+                    }
+                    *screenPixel ^= 0xFFFFFFFF;   
+                }
             }
         }
     }
+    
 
     void Chip8::inst_null(){
 
@@ -532,13 +541,13 @@ using namespace std;
                 inst_CLR();
                 break;
             case 0x000E:
-                inst_RET;
+                inst_RET();
                 break;           
             default:
             inst_null();
                 break;
             }
-            break;
+        break;
         case 0x8000 : 
             switch (opcode & 0x000F)
             {
@@ -573,6 +582,7 @@ using namespace std;
                 inst_null();
                 break;
             }
+        break;
         case  0xE000 : case  0xF000:
             switch (opcode & 0x00FF)
             {
@@ -613,6 +623,7 @@ using namespace std;
                 inst_null();
                 break;
             }
+            break;
         case 0x1000:
             inst_JUMP();
             break;
@@ -661,9 +672,8 @@ using namespace std;
 
 
     void Chip8::cycle(){
-        
-        opcode = (memory[PC] << 8) | memory[PC + 1];
-
+      
+        opcode = ((memory[PC] << 8) | memory[PC + 1]);     
         PC += 2;
 
         decode();
@@ -678,25 +688,6 @@ using namespace std;
             --soundTimer;
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
